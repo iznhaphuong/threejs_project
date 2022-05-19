@@ -1,0 +1,22 @@
+{
+  "name": "threejs_project",
+  "version": "1.0.0",
+  "description": "project game 3d",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iznhaphuong/threejs_project.git"
+  },
+  "author": "nha-phuong, linh-trang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iznhaphuong/threejs_project/issues"
+  },
+  "homepage": "https://github.com/iznhaphuong/threejs_project#readme",
+  "dependencies": {
+    "three": "^0.140.2"
+  }
+}
