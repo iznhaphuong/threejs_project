@@ -1,7 +1,5 @@
 import * as THREE from 'three'
-// import { OBJLoader } from '/jsm/loaders/OBJLoader.js'
 import { OrbitControls } from '/jsm/controls/OrbitControls.js'
-// import { ObjectLoader } from '/node_modules/three/src/loaders/ObjectLoader.js'
 
 export class Plane {
     constructor() {
@@ -30,7 +28,7 @@ export class Plane {
     setPosition(object) {
         object.rotation.x = -0.5 * Math.PI;
         object.position.x = 0;
-        object.position.y = 1;
+        object.position.y = -5;
         object.position.z = 0;
     }
 

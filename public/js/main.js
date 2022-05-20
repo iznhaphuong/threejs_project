@@ -1,12 +1,14 @@
 import * as THREE from 'three'
-// import { createPlane, planeAnimate } from './plane.js'
-import { Plane } from './plane.js'
 import { OrbitControls } from '/jsm/controls/OrbitControls.js'
+
 import { ObjectLoader } from '/src/loaders/ObjectLoader.js'
 import { AxesHelper } from '/src/helpers/AxesHelper.js'
-
 // import { GUI } from '/jsm/libs/lil-gui.module.min.js'
 import Stats from '/jsm/libs/stats.module.js'
+
+//import self-defined class
+import { ModelLoader } from './model-loader.js'
+import { Plane } from './plane.js'
 
 //Define ThreeJS class
 class ThreeJS {
@@ -80,7 +82,6 @@ class ThreeJS {
 
     //Create datGUI 
     createGUI() {
-
         const gui = new dat.GUI();
         const co_ordinate = 100;
         const cameraFolder = gui.addFolder('Camera');
@@ -96,8 +97,9 @@ class ThreeJS {
     //Create Stats
     createStats() {
         const stats = Stats()
+        stats.setMode(0); // 0: fps, 1: ms, 2: mb, 3+: custom
         document.body.appendChild(stats.dom)
-        return stats;
+        return stats
     }
 }
 
@@ -109,25 +111,12 @@ var three = new ThreeJS();
 const planeModel = new Plane();
 three.scene.add(planeModel.plane);
 
-var loader = new THREE.ObjectLoader();
+//Just support .GLB, .GLTF, FBX
+ModelLoader.load(three.scene, '../resource/models/sneakers/scene.gltf');
 
-// loader.load(
-//     //model here
-//     '../resource/models/teapot/teapot-claraio.json',
-//     function (object) {
-//         three.scene.add(object);
-//     }
-// );
-
-// loader.load
-//     (
-//         // resource URL
-//         '../resource/models/fox/fox.json',
-//         // Function when resource is loaded
-//         function (object) {
-//             scene.add(object);
-//         }
-//     );
+// White directional light at half intensity shining from the top.
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+three.scene.add(directionalLight);
 
 //cập nhật animate của các object trong update()
 function update() {
