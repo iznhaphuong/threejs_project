@@ -3,16 +3,16 @@ import { FBXLoader } from '/jsm/loaders/FBXLoader.js'
 import { Box3, Vector3 } from 'three';
 
 export class ModelLoader {
-    static load(scene, path, xyz) {
+    static load(scene, path, xyz, scaleParam) {
         if (path.includes('glb') || path.includes('gltf')) {
             console.log('gltf');
-            this.loadGLTF(scene, path, xyz)
+            this.loadGLTF(scene, path, xyz, scaleParam)
         } else if (path.includes('fbx')) {
             console.log('fbx');
         }
     }
 
-    static loadGLTF(scene, path, xyz) {
+    static loadGLTF(scene, path, xyz, scaleParam) {
         // Instantiate a loader
         const loader = new GLTFLoader();
 
@@ -22,15 +22,29 @@ export class ModelLoader {
             path,
             // called when the resource is loaded
             function (gltf) {
+                
+                gltf.scene.traverse( function( node ) {
+
+                    if ( node.type === 'Mesh' ) { node.castShadow = true; }
+            
+                } );
+                
                 const object = gltf.scene;
+                
                 //setup center values
                 let bbox = new Box3().setFromObject(object);
                 let cent = bbox.getCenter(new Vector3());
                 let size = bbox.getSize(new Vector3());
                 let maxAxis = Math.max(size.x, size.y, size.z);
-
+                
+                let scale = 1.0;
                 //scale object
-                object.scale.multiplyScalar(1.0 / maxAxis);
+                if (scaleParam >= 0) {
+                    scale = scaleParam
+                    console.log(scale);
+                }
+
+                object.scale.multiplyScalar(scale / maxAxis);
                 bbox.setFromObject(object);
                 bbox.getCenter(cent);
                 bbox.getSize(size);
@@ -52,7 +66,7 @@ export class ModelLoader {
             },
             // called while loading is progressing
             function (xhr) {
-                console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                console.log(path + (xhr.loaded / xhr.total * 100) + '% loaded');
             },
             // called when loading has errors
             function (error) {

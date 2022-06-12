@@ -18,8 +18,13 @@ class ThreeJS {
         this.camera = this.createCamera();
         this.renderer = this.createRenderer();
         this.handleResize();
-        this.control = this.createControl();
-        this.control.update();
+        this.controls = this.createControl();
+
+        //Add lights
+        this.ambientLight = this.createAmbientLight();
+        this.scene.add(this.ambientLight);
+        this.directionalLight = this.createDirectionalLight();
+        this.scene.add(this.directionalLight);
         this.createGUI();
         this.stats = this.createStats();
     }
@@ -79,18 +84,22 @@ class ThreeJS {
         document.body.appendChild(renderer.domElement);
         // renderer.setClearColor(new THREE.Color(0xFFFFFF));
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMapSoft = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         return renderer;
     }
 
     //Creation Control 
-    createControl(){
-        const controls  = new OrbitControls(this.camera, this.renderer.domElement);
-        return controls ;
+    createControl() {
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.update();
     }
-    
+
     //Create datGUI 
     createGUI() {
         const gui = new dat.GUI();
+        //Camera gui
         const co_ordinate = 100;
         const cameraFolder = gui.addFolder('Camera');
         cameraFolder.add(this.camera.position, 'x', -co_ordinate, co_ordinate);
@@ -99,11 +108,78 @@ class ThreeJS {
         cameraFolder.add(this.camera, 'fov', 1, 179).onChange(value => {
             this.camera.updateProjectionMatrix();
         });
-        
+
         cameraFolder.open();
+        // Ambient Light GUI
+        const controls = {
+            ambientColor: this.ambientLight.color.getHex(),
+            directionalColor: this.directionalLight.color.getHex()
+        };
 
-        const lightFolder = gui.addFolder('Light');
+        const ambientFolder = gui.addFolder('Ambient Light');
+        ambientFolder.add(this.ambientLight, 'visible');
+        ambientFolder.add(this.ambientLight, 'intensity', 0, 10);
+        ambientFolder.addColor(controls, 'ambientColor').name('color')
+            .onChange(color => {
+                this.ambientLight.color.set(color);
+            });
 
+        //Directional Light GUI
+
+        const directionalFolder = gui.addFolder('Directional Light');
+        directionalFolder.add(this.directionalLight, 'visible');
+        directionalFolder.add(this.directionalLight, 'intensity', 0, 5);
+        directionalFolder.addColor(controls, 'directionalColor')
+            .name('color')
+            .onChange(color => {
+                this.directionalLight.color.set(color);
+            });
+        directionalFolder.add(this.directionalLight, 'castShadow');
+        // directionalFolder.add(this.directionalLightHelper, 'visible').name('helper');
+    }
+
+    //Create ambient light
+    createAmbientLight() {
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+        ambientLight.visible = true;
+        return ambientLight;
+    }
+
+    createDirectionalLight() {
+        const color = 0xeeeeee;
+        const directionalLight = new THREE.DirectionalLight(color);
+        directionalLight.intensity = 1;
+        directionalLight.castShadow = true;
+
+        directionalLight.position.set(10, 5, 0);
+        directionalLight.target.position.set(0, .4, 0);
+        this.scene.add(directionalLight.target);
+
+        directionalLight.visible = true;
+        directionalLight.shadowCameraVisible = true
+        // Phải cho đủ nếu không bóng sẽ bị cắt
+        directionalLight.shadow.camera.near = 2;
+        directionalLight.shadow.camera.far = 50;
+        directionalLight.shadow.camera.left = -5;
+        directionalLight.shadow.camera.right = 5;
+        directionalLight.shadow.camera.top = 5;
+        directionalLight.shadow.camera.bottom = -5;
+        directionalLight.shadow.mapSize.width = 50;
+        directionalLight.shadow.mapSize.height = 50;
+
+
+        const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight);
+        directionalLightHelper.visible = true;
+
+        const directionalCameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
+        directionalCameraHelper.visible = true;
+        
+        this.scene.add(
+            directionalLightHelper,
+            directionalCameraHelper
+        );
+
+        return directionalLight;
     }
 
     //Create Stats
@@ -126,30 +202,21 @@ const planeModel = new Plane();
 three.scene.add(planeModel.plane);
 
 //Just support .GLB, .GLTF, FBX
-const sneakersPath = '../resource/models/chinese_temple/scene.gltf';
 //3 params (scene, path of model, )
-ModelLoader.load(three.scene, sneakersPath, [10,2,2]);
 
+const templePath = '../resource/models/chinese_temple/scene.gltf';
+ModelLoader.load(three.scene, templePath, [0, -.4, 0], );
 
-///////////////////////////////
-/// SET UP THE LIGHTS   //////
-/////////////////////////////
-const ambientLight = new THREE.AmbientLight(0xffffff, 3);
-three.scene.add(ambientLight);
-
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-three.scene.add(directionalLight);
-
+const courtyartPath = '../resource/models/ancient_chinese_courtyard_park/scene.gltf';
+ModelLoader.load(three.scene, courtyartPath, [5, -.4, 0], 15);
 
 //cập nhật animate của các object trong update()
 function update() {
     // planeModel.animate();
 }
 
-//////////////////////////////
-/// RENDER            ///////
-////////////////////////////
 
+//Render
 three.render();
 
 
