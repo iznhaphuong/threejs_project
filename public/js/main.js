@@ -112,9 +112,14 @@ const planeModel = new Plane();
 three.scene.add(planeModel.plane);
 
 //Just support .GLB, .GLTF, FBX
-ModelLoader.load(three.scene, '../resource/models/sneakers/scene.gltf');
+const sneakersPath = '../resource/models/sneakers/scene.gltf';
+//3 params (scene, path of model, )
+ModelLoader.load(three.scene, sneakersPath, [10,2,2]);
 
 // White directional light at half intensity shining from the top.
+const ambientLight = new THREE.AmbientLight(0xffffff, 3);
+three.scene.add(ambientLight);
+
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
 three.scene.add(directionalLight);
 
