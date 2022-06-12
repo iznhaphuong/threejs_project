@@ -18,6 +18,8 @@ class ThreeJS {
         this.camera = this.createCamera();
         this.renderer = this.createRenderer();
         this.handleResize();
+        this.control = this.createControl();
+        this.control.update();
         this.createGUI();
         this.stats = this.createStats();
     }
@@ -25,9 +27,9 @@ class ThreeJS {
     //For Render()
     render() {
         update();
-        this.renderer.render(this.scene, this.camera);
         //XỬ LÝ ANIMATION - render cảnh nhiều lần tạo anmt
         requestAnimationFrame(this.render.bind(this));
+        this.renderer.render(this.scene, this.camera);
         this.stats.update();
     }
 
@@ -80,6 +82,12 @@ class ThreeJS {
         return renderer;
     }
 
+    //Creation Control 
+    createControl(){
+        const controls  = new OrbitControls(this.camera, this.renderer.domElement);
+        return controls ;
+    }
+    
     //Create datGUI 
     createGUI() {
         const gui = new dat.GUI();
@@ -91,7 +99,11 @@ class ThreeJS {
         cameraFolder.add(this.camera, 'fov', 1, 179).onChange(value => {
             this.camera.updateProjectionMatrix();
         });
+        
         cameraFolder.open();
+
+        const lightFolder = gui.addFolder('Light');
+
     }
 
     //Create Stats
@@ -107,28 +119,37 @@ class ThreeJS {
 var three = new ThreeJS();
 
 
-//Add 3D Object
+///////////////////////////////
+/// ADD 3D OBJECT MODEL///////
+/////////////////////////////
 const planeModel = new Plane();
 three.scene.add(planeModel.plane);
 
 //Just support .GLB, .GLTF, FBX
-const sneakersPath = '../resource/models/sneakers/scene.gltf';
+const sneakersPath = '../resource/models/chinese_temple/scene.gltf';
 //3 params (scene, path of model, )
 ModelLoader.load(three.scene, sneakersPath, [10,2,2]);
 
-// White directional light at half intensity shining from the top.
+
+///////////////////////////////
+/// SET UP THE LIGHTS   //////
+/////////////////////////////
 const ambientLight = new THREE.AmbientLight(0xffffff, 3);
 three.scene.add(ambientLight);
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
 three.scene.add(directionalLight);
 
+
 //cập nhật animate của các object trong update()
 function update() {
     // planeModel.animate();
 }
 
-//Render
+//////////////////////////////
+/// RENDER            ///////
+////////////////////////////
+
 three.render();
 
 
