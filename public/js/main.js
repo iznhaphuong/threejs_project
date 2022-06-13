@@ -207,8 +207,8 @@ three.scene.add(planeModel.plane);
 const templePath = '../resource/models/chinese_temple/scene.gltf';
 ModelLoader.load(three.scene, templePath, [0, -.4, 0], );
 
-const courtyartPath = '../resource/models/ancient_chinese_courtyard_park/scene.gltf';
-ModelLoader.load(three.scene, courtyartPath, [5, -.4, 0], 15);
+// const courtyartPath = '../resource/models/ancient_chinese_courtyard_park/scene.gltf';
+// ModelLoader.load(three.scene, courtyartPath, [5, -.4, 0], 15);
 
 //cập nhật animate của các object trong update()
 function update() {
