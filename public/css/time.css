@@ -5,3 +5,9 @@
     color: white;
     text-shadow: 1px 1px black;
 }
+
+.text-time{
+    line-height: 100%;
+    vertical-align: center;
+    align-self: center;
+}
