@@ -41,9 +41,7 @@ export class ModelLoader {
                 //scale object
                 if (scaleParam >= 0) {
                     scale = scaleParam
-                    console.log(scale);
                 }
-
                 object.scale.multiplyScalar(scale / maxAxis);
                 bbox.setFromObject(object);
                 bbox.getCenter(cent);
@@ -60,7 +58,6 @@ export class ModelLoader {
                     object.position.y -= xyz[1];
                     object.position.z -= xyz[2];
                 }
-
 
                 scene.add(object);
             },
@@ -96,7 +93,6 @@ export class ModelLoader {
             // called when loading has errors
             function (error) {
                 console.log('An error happened');
-
             }
         );
     }

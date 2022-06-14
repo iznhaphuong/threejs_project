@@ -14,7 +14,7 @@ export class Plane {
         grassTexture.repeat.set(10,10);
 
         //Create geometry, material
-        const planeGeometry = new THREE.PlaneGeometry(50, 50, 1, 1);
+        const planeGeometry = new THREE.PlaneGeometry(500, 500);
         const planeMaterial = new THREE.MeshLambertMaterial ({
             color: '#e6cb00', map: grassTexture
         });
