@@ -10,7 +10,6 @@ import Stats from '/jsm/libs/stats.module.js'
 //import self-defined class
 import { ModelLoader } from './model-loader.js'
 import { Plane } from './plane.js'
-import { SkyBox } from './sky-box.js'
 import { updateCurrentTime } from '../js/controllers/time-controller.js'
 import { changeBackground } from '../js/controllers/time-controller.js'
 
@@ -114,7 +113,7 @@ class ThreeJS {
             this.camera.updateProjectionMatrix();
         });
 
-        cameraFolder.open();
+        // cameraFolder.open();
         // Ambient Light GUI
         const controls = {
             ambientColor: this.ambientLight.color.getHex(),
@@ -208,8 +207,6 @@ updateCurrentTime(three)
 /////////////////////////////
 const planeModel = new Plane();
 three.scene.add(planeModel.plane);
-
-
 
 //Just support .GLB, .GLTF, FBX
 //3 params (scene, path of model, )

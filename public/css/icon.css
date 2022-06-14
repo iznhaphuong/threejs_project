@@ -1,0 +1,20 @@
+.wrap-icon {
+    position: absolute;
+    width: 5%;
+    right: 1%;
+    top: 30%;
+}
+.icon-quest {
+    border-radius: 50%;
+    background-image: url('../resource/icons/tied-scroll.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 25px;
+    width: 25px;
+    background-size: 25px;
+}
+.icon-quest:hover {
+    padding: 5px;
+    border: 2px solid #fff;
+    box-shadow: 1px 0 2px #fff;
+}
