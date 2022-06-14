@@ -200,7 +200,7 @@ class ThreeJS {
 var three = new ThreeJS();
 
 var hour = new Date().getMinutes();
-console.log(changeBackground(three, hour % 24 + 17 ))
+console.log(changeBackground(three, hour % 24))
 updateCurrentTime(three)
 
 ///////////////////////////////
