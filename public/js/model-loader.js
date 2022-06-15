@@ -43,7 +43,6 @@ export class ModelLoader {
                 if (scaleParam >= 0) {
                     scale = scaleParam;
                 }
-
                 object.scale.multiplyScalar(scale / maxAxis);
                 bbox.setFromObject(object);
                 bbox.getCenter(cent);
@@ -60,13 +59,6 @@ export class ModelLoader {
                     object.position.y -= xyz[1];
                     object.position.z -= xyz[2];
                 }
-                // const anim = new GLTFLoader();
-                // // anim.setPath(animPath);
-                // anim.load('../resource/models/character/just_a_beautiful_girl/scene.gltf', (anim) => {
-                //     gltf.mixer =  new THREE.AnimationMixer(object);
-                //     const idle = gltf.mixer.clipAction(anim.animations[0]);
-                //     idle.play();
-                // });
 
                 scene.add(object);
             },
@@ -117,7 +109,6 @@ export class ModelLoader {
             // called when loading has errors
             function (error) {
                 console.log('An error happened');
-
             }
 
         );
