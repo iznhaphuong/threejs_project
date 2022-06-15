@@ -205,6 +205,7 @@ var three = new ThreeJS();
 var hour = new Date().getMinutes();
 console.log(changeBackground(three, hour % 24))
 updateCurrentTime(three)
+updatePosition(three)
 
 ///////////////////////////////
 /// ADD 3D OBJECT MODEL///////

@@ -29,7 +29,7 @@ export function updateCurrentTime(three) {
         else if (flag != 2 && my_hour == 16) {
             flag = setAtEvening(three)
         }
-    }, 5000)
+    }, 1000)
 }
 
 
