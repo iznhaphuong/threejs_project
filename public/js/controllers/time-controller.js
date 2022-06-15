@@ -8,8 +8,6 @@ var flag = 99;
 
 export function updateCurrentTime(three) {
     setInterval(function () {
-        console.log(flag);
-
         let today = new Date()
         var my_hour = today.getMinutes() % 24 
         var my_minute = today.getSeconds()
@@ -31,7 +29,7 @@ export function updateCurrentTime(three) {
         else if (flag != 2 && my_hour == 16) {
             flag = setAtEvening(three)
         }
-    })
+    }, 5000)
 }
 
 

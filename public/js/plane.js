@@ -2,27 +2,22 @@ import * as THREE from 'three'
 import { OrbitControls } from '/jsm/controls/OrbitControls.js'
 
 export class Plane {
-    constructor() {
-        this.plane = this.createPlane();
+    constructor(three) {
+        this.plane = this.createPlane(three);
     }
 
-    createPlane() {
-        var textureLoader= new THREE.TextureLoader();
-        var grassTexture=textureLoader.load("../resource/textures/terrians/grass1.jpg");
-        grassTexture.wrapS=THREE.RepeatWrapping;
-        grassTexture.wrapT=THREE.RepeatWrapping;
-        grassTexture.repeat.set(10,10);
+    createPlane(three) {
+        var textureLoader = new THREE.TextureLoader();
+        var grassTexture = textureLoader.load("../resource/textures/terrians/grass1.jpg");
+        grassTexture.wrapS = THREE.RepeatWrapping;
+        grassTexture.wrapT = THREE.RepeatWrapping;
+        grassTexture.repeat.set(10, 10);
 
         //Create geometry, material
         const planeGeometry = new THREE.PlaneGeometry(500, 500);
-        const planeMaterial = new THREE.MeshLambertMaterial ({
+        const planeMaterial = new THREE.MeshLambertMaterial({
             color: '#e6cb00', map: grassTexture
         });
-
-        
-        //Set opacity to material
-        // planeMaterial.opacity = 0.5; // k hien thi, phải thêm transparent bằng true
-        // planeMaterial.transparent = true;
 
         //Mesh 
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -30,9 +25,9 @@ export class Plane {
         plane.receiveShadow = true;
 
         return plane;
-        
+
     }
-    
+
     //Set position
     setPosition(object) {
         object.rotation.x = -.5 * Math.PI;
