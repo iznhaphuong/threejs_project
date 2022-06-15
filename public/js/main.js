@@ -203,8 +203,8 @@ class ThreeJS {
 //Create ThreeJS object without render 
 var three = new ThreeJS();
 var hour = new Date().getMinutes();
-// console.log(changeBackground(three, hour % 24))
-// updateCurrentTime(three)
+console.log(changeBackground(three, hour % 24))
+updateCurrentTime(three)
 
 ///////////////////////////////
 /// ADD 3D OBJECT MODEL///////
@@ -233,24 +233,26 @@ ModelLoader.load(three.scene, trees, [-10, 0, 10], 12);
 
 //cập nhật animate của các object trong update()
 function update() {
-    updatePosition(three)
-    resetMaterials()
-    hoverPieces()
-    // console.log(three.camera.position);
-    // planeModel.animate();
+    // resetMaterials()
+    // hoverPieces()
 }
 
+// when camera change
 function onPointerMove(event) {
+    // cap nhat lai vi tri
+    updatePosition(three)
     three.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
     three.pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
 }
-function hoverPieces() {
-    three.raycaster.setFromCamera(three.pointer, three.camera)
-    const intersects = three.raycaster.intersectObjects(three.scene.children);
-    for (let i = 0; i < intersects.length; i++) {
-        intersects[i].object.material.opacity = 0
-    }
-}
+
+//  function when hover
+// function hoverPieces() {
+//     three.raycaster.setFromCamera(three.pointer, three.camera)
+//     const intersects = three.raycaster.intersectObjects(three.scene.children);
+//     for (let i = 0; i < intersects.length; i++) {
+//         intersects[i].object.material.opacity = 0
+//     }
+// }
 
 function resetMaterials() {
     for (let i = 0; i < three.scene.children.length; i++) {

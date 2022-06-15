@@ -62,7 +62,7 @@ export class ModelLoader {
                 }
                 object.name = path
                 console.log(object);
-
+                
                 scene.add(object);
             },
             // called while loading is progressing
