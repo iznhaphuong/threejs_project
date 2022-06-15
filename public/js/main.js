@@ -51,7 +51,7 @@ class BasicCharacterController {
     _LoadModels() {
         const loader = new FBXLoader();
         loader.setPath('./resource/models/character/main_character/');
-        loader.load('erika_archer.fbx', (fbx) => {
+        loader.load('guard.fbx', (fbx) => {
             fbx.traverse(c => {
                 c.castShadow = true;
             });
@@ -108,11 +108,12 @@ class BasicCharacterController {
             };
 
             const loader = new FBXLoader(this._manager);
-            loader.setPath('./resource/models/character/main_character/animations/');
+            loader.setPath('./resource/models/character/main_character/guard/');
             loader.load('walk.fbx', (a) => { _OnLoad('walk', a); });
             loader.load('run.fbx', (a) => { _OnLoad('run', a); });
             loader.load('idle.fbx', (a) => { _OnLoad('idle', a); });
-            loader.load('dance.fbx', (a) => { _OnLoad('dance', a); });
+            loader.load('kick.fbx', (a) => { _OnLoad('dance', a); });
+
         });
     }
 
@@ -217,25 +218,27 @@ class BasicCharacterControllerInput {
         switch (event.keyCode) {
             case 87: // w
                 this._keys.forward = true;
-                console.log("forward");
+
                 break;
             case 65: // a
                 this._keys.left = true;
-                console.log("left");
+
                 break;
             case 83: // s
                 this._keys.backward = true;
-                console.log("backward");
+
                 break;
             case 68: // d
                 this._keys.right = true;
-                console.log("right");
+
                 break;
             case 32: // SPACE
                 this._keys.space = true;
+
                 break;
             case 16: // SHIFT
                 this._keys.shift = true;
+
                 break;
         }
     }
@@ -836,8 +839,8 @@ const monster = '../resource/models/character/wooden/scene.gltf';
 // const courtyartPath = '../resource/models/ancient_chinese_courtyard_park/scene.gltf';
 // ModelLoader.load(three.scene, monster, [5, -.4, 0],20);
 // ModelLoader.loadFBX(three.scene,'../resource/models/character/characterLola.fbx','../resource/models/monster/breakdance1990.fbx')
-ModelLoader.load(three.scene, templePath, [-35, -4.25, 0], 10);
-ModelLoader.load(three.scene, templePath, [35, -4.25, 0], 10);
+// ModelLoader.load(three.scene, templePath, [-35, -4.25, 0], 10);
+// ModelLoader.load(three.scene, templePath, [35, -4.25, 0], 10);
 const courtyartPath = '../resource/models/ancient_chinese_courtyard_park/scene.gltf';
 ModelLoader.load(three.scene, courtyartPath, [0, -.4, 0], 70);
 // Monster.loadModel(three.scene,three.mixers,[0, -.4, 0],1.0);
