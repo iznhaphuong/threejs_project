@@ -12,9 +12,21 @@
     height: 25px;
     width: 25px;
     background-size: 25px;
+    cursor: pointer;
 }
 .icon-quest:hover {
     padding: 5px;
     border: 2px solid #fff;
     box-shadow: 1px 0 2px #fff;
+}
+.modal-content{
+    background: rgba(0, 0, 0, .3);
+    color: white
+}
+#location {
+    position: fixed;
+    bottom: 3%;
+    left: 2%;
+    color: white;
+    user-select: none;
 }

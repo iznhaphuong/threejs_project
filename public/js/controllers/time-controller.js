@@ -8,8 +8,6 @@ var flag = 99;
 
 export function updateCurrentTime(three) {
     setInterval(function () {
-        console.log(flag);
-
         let today = new Date()
         var my_hour = today.getMinutes() % 24 
         var my_minute = today.getSeconds()
