@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from '/jsm/controls/OrbitControls.js'
+import { FBXLoader } from '/jsm/loaders/FBXLoader.js';
 
 import { ObjectLoader } from '/src/loaders/ObjectLoader.js'
 import { AxesHelper } from '/src/helpers/AxesHelper.js'
@@ -11,29 +12,91 @@ import { ModelLoader } from './model-loader.js'
 import { Plane } from './plane.js'
 import { Monster } from './monster.js'
 
-
 //Define ThreeJS class
 class ThreeJS {
     //Constructor
     constructor() {
-        
+
         this.scene = this.createScene();
         this.camera = this.createCamera();
         this.renderer = this.createRenderer();
         this.handleResize();
+        this.controls = this.createControl();
+
+        //Add lights
+        this.ambientLight = this.createAmbientLight();
+        this.scene.add(this.ambientLight);
+        this.directionalLight = this.createDirectionalLight();
+        this.scene.add(this.directionalLight);
         this.createGUI();
         this.stats = this.createStats();
+        this.mixers = [];
+        this.previousRAF = null;
+        // Monster.loadModel(this.scene,this.mixers);
+        // this._LoadAnimatedModel();
+
     }
 
     //For Render()
     render() {
         update();
-        this.renderer.render(this.scene, this.camera);
         //XỬ LÝ ANIMATION - render cảnh nhiều lần tạo anmt
         requestAnimationFrame(this.render.bind(this));
+        this.renderer.render(this.scene, this.camera);
         this.stats.update();
+       
+        
+        this._RAF();
     }
 
+    _RAF() {
+        requestAnimationFrame((t) => {
+            if (this.previousRAF === null) {
+                this.previousRAF = t;
+            }
+
+            this._RAF();
+            this.renderer.render(this.scene, this.camera);
+            this._Step(t - this.previousRAF);
+            this.previousRAF = t;
+        });
+    }
+    _Step(timeElapsed) {
+        const timeElapsedS = timeElapsed * 0.001;
+        if (this.mixers) {
+            this.mixers.map(m => m.update(timeElapsedS));
+        }
+
+        if (this.controls) {
+            this.controls.Update(timeElapsedS);
+        }
+    }
+    _LoadAnimatedModel() {
+        const loader = new FBXLoader();
+        loader.setPath('./resources/zombie/');
+        loader.load('mremireh_o_desbiens.fbx', (fbx) => {
+          fbx.scale.setScalar(0.1);
+          fbx.traverse(c => {
+            c.castShadow = true;
+          });
+    
+          const params = {
+            target: fbx,
+            camera: this.camera,
+          }
+        //   this._controls = new BasicCharacterControls(params);
+    
+          const anim = new FBXLoader();
+          anim.setPath('./resources/zombie/');
+          anim.load('walk.fbx', (anim) => {
+            const m = new THREE.AnimationMixer(fbx);
+            this.mixers.push(m);
+            const idle = m.clipAction(anim.animations[0]);
+            idle.play();
+          });
+          this.scene.add(fbx);
+        });
+      }
     //Create SCENE
     createScene() {
         const scene = new THREE.Scene();
@@ -80,12 +143,24 @@ class ThreeJS {
         document.body.appendChild(renderer.domElement);
         // renderer.setClearColor(new THREE.Color(0xFFFFFF));
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMapSoft = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+       
+
         return renderer;
+    }
+
+    //Creation Control 
+    createControl() {
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.update();
     }
 
     //Create datGUI 
     createGUI() {
         const gui = new dat.GUI();
+        //Camera gui
         const co_ordinate = 100;
         const cameraFolder = gui.addFolder('Camera');
         cameraFolder.add(this.camera.position, 'x', -co_ordinate, co_ordinate);
@@ -94,7 +169,78 @@ class ThreeJS {
         cameraFolder.add(this.camera, 'fov', 1, 179).onChange(value => {
             this.camera.updateProjectionMatrix();
         });
+
         cameraFolder.open();
+        // Ambient Light GUI
+        const controls = {
+            ambientColor: this.ambientLight.color.getHex(),
+            directionalColor: this.directionalLight.color.getHex()
+        };
+
+        const ambientFolder = gui.addFolder('Ambient Light');
+        ambientFolder.add(this.ambientLight, 'visible');
+        ambientFolder.add(this.ambientLight, 'intensity', 0, 10);
+        ambientFolder.addColor(controls, 'ambientColor').name('color')
+            .onChange(color => {
+                this.ambientLight.color.set(color);
+            });
+
+        //Directional Light GUI
+
+        const directionalFolder = gui.addFolder('Directional Light');
+        directionalFolder.add(this.directionalLight, 'visible');
+        directionalFolder.add(this.directionalLight, 'intensity', 0, 5);
+        directionalFolder.addColor(controls, 'directionalColor')
+            .name('color')
+            .onChange(color => {
+                this.directionalLight.color.set(color);
+            });
+        directionalFolder.add(this.directionalLight, 'castShadow');
+        // directionalFolder.add(this.directionalLightHelper, 'visible').name('helper');
+    }
+
+    //Create ambient light
+    createAmbientLight() {
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+        ambientLight.visible = true;
+        return ambientLight;
+    }
+
+    createDirectionalLight() {
+        const color = 0xeeeeee;
+        const directionalLight = new THREE.DirectionalLight(color);
+        directionalLight.intensity = 1;
+        directionalLight.castShadow = true;
+
+        directionalLight.position.set(10, 5, 0);
+        directionalLight.target.position.set(0, .4, 0);
+        this.scene.add(directionalLight.target);
+
+        directionalLight.visible = true;
+        directionalLight.shadowCameraVisible = true
+        // Phải cho đủ nếu không bóng sẽ bị cắt
+        directionalLight.shadow.camera.near = 2;
+        directionalLight.shadow.camera.far = 50;
+        directionalLight.shadow.camera.left = -5;
+        directionalLight.shadow.camera.right = 5;
+        directionalLight.shadow.camera.top = 5;
+        directionalLight.shadow.camera.bottom = -5;
+        directionalLight.shadow.mapSize.width = 50;
+        directionalLight.shadow.mapSize.height = 50;
+
+
+        const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight);
+        directionalLightHelper.visible = true;
+
+        const directionalCameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
+        directionalCameraHelper.visible = true;
+
+        this.scene.add(
+            directionalLightHelper,
+            directionalCameraHelper
+        );
+
+        return directionalLight;
     }
 
     //Create Stats
@@ -110,26 +256,356 @@ class ThreeJS {
 var three = new ThreeJS();
 
 
-//Add 3D Object
+///////////////////////////////
+/// ADD 3D OBJECT MODEL///////
+/////////////////////////////
 const planeModel = new Plane();
 three.scene.add(planeModel.plane);
 
 //Just support .GLB, .GLTF, FBX
-// ModelLoader.load(three.scene, '../resource/models/sneakers/scene.gltf');
-// ModelLoader.loadFBX(three.scene, '../resource/models/monster/maw_j_laygo.fbx','../resource/models/monster/Breakdance_1990.fbx');
+//3 params (scene, path of model, )
+
+const templePath = '../resource/models/chinese_temple/scene.gltf';
+const monster = '../resource/models/character/wooden/scene.gltf';
+ModelLoader.load(three.scene, templePath, [0, -.4, 0],);
 Monster.loadModel(three.scene);
-
-
-// White directional light at half intensity shining from the top.
-const directionalLight = new THREE.DirectionalLight(0xffffff, 10);
-three.scene.add(directionalLight);
+// const courtyartPath = '../resource/models/ancient_chinese_courtyard_park/scene.gltf';
+// ModelLoader.load(three.scene, monster, [5, -.4, 0],20);
+// ModelLoader.loadFBX(three.scene,'../resource/models/character/characterLola.fbx','../resource/models/monster/breakdance1990.fbx')
 
 //cập nhật animate của các object trong update()
+// var prevTime = Date.now();
 function update() {
     // planeModel.animate();
+    // const mixer = new THREE.AnimationMixer(this.scene);
+    // // if(mixer){
+    // var time = Date.now();
+    // mixer.update((time - prevTime) * 0.001);
+    // prevTime = time;
+    // }
+
 }
+
 
 //Render
 three.render();
 
 
+
+
+// import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
+
+// import {FBXLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/FBXLoader.js';
+// import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js';
+// import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
+
+
+// class BasicCharacterControls {
+//   constructor(params) {
+//     this._Init(params);
+//   }
+
+//   _Init(params) {
+//     this._params = params;
+//     this._move = {
+//       forward: false,
+//       backward: false,
+//       left: false,
+//       right: false,
+//     };
+//     this._decceleration = new THREE.Vector3(-0.0005, -0.0001, -5.0);
+//     this._acceleration = new THREE.Vector3(1, 0.25, 50.0);
+//     this._velocity = new THREE.Vector3(0, 0, 0);
+
+//     document.addEventListener('keydown', (e) => this._onKeyDown(e), false);
+//     document.addEventListener('keyup', (e) => this._onKeyUp(e), false);
+//   }
+
+//   _onKeyDown(event) {
+//     switch (event.keyCode) {
+//       case 87: // w
+//         this._move.forward = true;
+//         break;
+//       case 65: // a
+//         this._move.left = true;
+//         break;
+//       case 83: // s
+//         this._move.backward = true;
+//         break;
+//       case 68: // d
+//         this._move.right = true;
+//         break;
+//       case 38: // up
+//       case 37: // left
+//       case 40: // down
+//       case 39: // right
+//         break;
+//     }
+//   }
+
+//   _onKeyUp(event) {
+//     switch(event.keyCode) {
+//       case 87: // w
+//         this._move.forward = false;
+//         break;
+//       case 65: // a
+//         this._move.left = false;
+//         break;
+//       case 83: // s
+//         this._move.backward = false;
+//         break;
+//       case 68: // d
+//         this._move.right = false;
+//         break;
+//       case 38: // up
+//       case 37: // left
+//       case 40: // down
+//       case 39: // right
+//         break;
+//     }
+//   }
+
+//   Update(timeInSeconds) {
+//     const velocity = this._velocity;
+//     const frameDecceleration = new THREE.Vector3(
+//         velocity.x * this._decceleration.x,
+//         velocity.y * this._decceleration.y,
+//         velocity.z * this._decceleration.z
+//     );
+//     frameDecceleration.multiplyScalar(timeInSeconds);
+//     frameDecceleration.z = Math.sign(frameDecceleration.z) * Math.min(
+//         Math.abs(frameDecceleration.z), Math.abs(velocity.z));
+
+//     velocity.add(frameDecceleration);
+
+//     const controlObject = this._params.target;
+//     const _Q = new THREE.Quaternion();
+//     const _A = new THREE.Vector3();
+//     const _R = controlObject.quaternion.clone();
+
+//     if (this._move.forward) {
+//       velocity.z += this._acceleration.z * timeInSeconds;
+//     }
+//     if (this._move.backward) {
+//       velocity.z -= this._acceleration.z * timeInSeconds;
+//     }
+//     if (this._move.left) {
+//       _A.set(0, 1, 0);
+//       _Q.setFromAxisAngle(_A, Math.PI * timeInSeconds * this._acceleration.y);
+//       _R.multiply(_Q);
+//     }
+//     if (this._move.right) {
+//       _A.set(0, 1, 0);
+//       _Q.setFromAxisAngle(_A, -Math.PI * timeInSeconds * this._acceleration.y);
+//       _R.multiply(_Q);
+//     }
+
+//     controlObject.quaternion.copy(_R);
+
+//     const oldPosition = new THREE.Vector3();
+//     oldPosition.copy(controlObject.position);
+
+//     const forward = new THREE.Vector3(0, 0, 1);
+//     forward.applyQuaternion(controlObject.quaternion);
+//     forward.normalize();
+
+//     const sideways = new THREE.Vector3(1, 0, 0);
+//     sideways.applyQuaternion(controlObject.quaternion);
+//     sideways.normalize();
+
+//     sideways.multiplyScalar(velocity.x * timeInSeconds);
+//     forward.multiplyScalar(velocity.z * timeInSeconds);
+
+//     controlObject.position.add(forward);
+//     controlObject.position.add(sideways);
+
+//     oldPosition.copy(controlObject.position);
+//   }
+// }
+
+
+// class LoadModelDemo {
+//   constructor() {
+//     this._Initialize();
+//   }
+
+//   _Initialize() {
+//     this._threejs = new THREE.WebGLRenderer({
+//       antialias: true,
+//     });
+//     this._threejs.shadowMap.enabled = true;
+//     this._threejs.shadowMap.type = THREE.PCFSoftShadowMap;
+//     this._threejs.setPixelRatio(window.devicePixelRatio);
+//     this._threejs.setSize(window.innerWidth, window.innerHeight);
+
+//     document.body.appendChild(this._threejs.domElement);
+
+//     window.addEventListener('resize', () => {
+//       this._OnWindowResize();
+//     }, false);
+
+//     const fov = 60;
+//     const aspect = 1920 / 1080;
+//     const near = 1.0;
+//     const far = 1000.0;
+//     this._camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+//     this._camera.position.set(75, 20, 0);
+
+//     this._scene = new THREE.Scene();
+
+//     let light = new THREE.DirectionalLight(0xFFFFFF, 1.0);
+//     light.position.set(20, 100, 10);
+//     light.target.position.set(0, 0, 0);
+//     light.castShadow = true;
+//     light.shadow.bias = -0.001;
+//     light.shadow.mapSize.width = 2048;
+//     light.shadow.mapSize.height = 2048;
+//     light.shadow.camera.near = 0.1;
+//     light.shadow.camera.far = 500.0;
+//     light.shadow.camera.near = 0.5;
+//     light.shadow.camera.far = 500.0;
+//     light.shadow.camera.left = 100;
+//     light.shadow.camera.right = -100;
+//     light.shadow.camera.top = 100;
+//     light.shadow.camera.bottom = -100;
+//     this._scene.add(light);
+
+//     light = new THREE.AmbientLight(0xFFFFFF, 4.0);
+//     this._scene.add(light);
+
+//     const controls = new OrbitControls(
+//       this._camera, this._threejs.domElement);
+//     controls.target.set(0, 20, 0);
+//     controls.update();
+
+//     const loader = new THREE.CubeTextureLoader();
+//     const texture = loader.load([
+//         './resources/posx.jpg',
+//         './resources/negx.jpg',
+//         './resources/posy.jpg',
+//         './resources/negy.jpg',
+//         './resources/posz.jpg',
+//         './resources/negz.jpg',
+//     ]);
+//     this._scene.background = texture;
+
+//     const plane = new THREE.Mesh(
+//         new THREE.PlaneGeometry(100, 100, 10, 10),
+//         new THREE.MeshStandardMaterial({
+//             color: 0x202020,
+//           }));
+//     plane.castShadow = false;
+//     plane.receiveShadow = true;
+//     plane.rotation.x = -Math.PI / 2;
+//     this._scene.add(plane);
+
+//     this._mixers = [];
+//     this._previousRAF = null;
+
+//     this._LoadAnimatedModel();
+//     // this._LoadAnimatedModelAndPlay(
+//     //     './resources/dancer/', 'girl.fbx', 'dance.fbx', new THREE.Vector3(0, -1.5, 5));
+//     // this._LoadAnimatedModelAndPlay(
+//     //     './resources/dancer/', 'dancer.fbx', 'Silly Dancing.fbx', new THREE.Vector3(12, 0, -10));
+//     // this._LoadAnimatedModelAndPlay(
+//     //     './resources/dancer/', 'dancer.fbx', 'Silly Dancing.fbx', new THREE.Vector3(-12, 0, -10));
+//     this._RAF();
+//   }
+
+//   _LoadAnimatedModel() {
+//     const loader = new FBXLoader();
+//     loader.setPath('./resources/zombie/');
+//     loader.load('mremireh_o_desbiens.fbx', (fbx) => {
+//       fbx.scale.setScalar(0.1);
+//       fbx.traverse(c => {
+//         c.castShadow = true;
+//       });
+
+//       const params = {
+//         target: fbx,
+//         camera: this._camera,
+//       }
+//       this._controls = new BasicCharacterControls(params);
+
+//       const anim = new FBXLoader();
+//       anim.setPath('./resources/zombie/');
+//       anim.load('walk.fbx', (anim) => {
+//         const m = new THREE.AnimationMixer(fbx);
+//         this._mixers.push(m);
+//         const idle = m.clipAction(anim.animations[0]);
+//         idle.play();
+//       });
+//       this._scene.add(fbx);
+//     });
+//   }
+
+//   _LoadAnimatedModelAndPlay(path, modelFile, animFile, offset) {
+//     const loader = new FBXLoader();
+//     loader.setPath(path);
+//     loader.load(modelFile, (fbx) => {
+//       fbx.scale.setScalar(0.1);
+//       fbx.traverse(c => {
+//         c.castShadow = true;
+//       });
+//       fbx.position.copy(offset);
+
+//       const anim = new FBXLoader();
+//       anim.setPath(path);
+//       anim.load(animFile, (anim) => {
+//         const m = new THREE.AnimationMixer(fbx);
+//         this._mixers.push(m);
+//         const idle = m.clipAction(anim.animations[0]);
+//         idle.play();
+//       });
+//       this._scene.add(fbx);
+//     });
+//   }
+
+//   _LoadModel() {
+//     const loader = new GLTFLoader();
+//     loader.load('./resources/thing.glb', (gltf) => {
+//       gltf.scene.traverse(c => {
+//         c.castShadow = true;
+//       });
+//       this._scene.add(gltf.scene);
+//     });
+//   }
+
+//   _OnWindowResize() {
+//     this._camera.aspect = window.innerWidth / window.innerHeight;
+//     this._camera.updateProjectionMatrix();
+//     this._threejs.setSize(window.innerWidth, window.innerHeight);
+//   }
+
+//   _RAF() {
+//     requestAnimationFrame((t) => {
+//       if (this._previousRAF === null) {
+//         this._previousRAF = t;
+//       }
+
+//       this._RAF();
+
+//       this._threejs.render(this._scene, this._camera);
+//       this._Step(t - this._previousRAF);
+//       this._previousRAF = t;
+//     });
+//   }
+
+//   _Step(timeElapsed) {
+//     const timeElapsedS = timeElapsed * 0.001;
+//     if (this._mixers) {
+//       this._mixers.map(m => m.update(timeElapsedS));
+//     }
+
+//     if (this._controls) {
+//       this._controls.Update(timeElapsedS);
+//     }
+//   }
+// }
+
+
+// let _APP = null;
+
+// window.addEventListener('DOMContentLoaded', () => {
+//   _APP = new ThreeJS();
+// });
