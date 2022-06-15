@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-
 import { OrbitControls } from '/jsm/controls/OrbitControls.js'
 import { FBXLoader } from '/jsm/loaders/FBXLoader.js';
 import { Box3, Vector3 } from 'three';
@@ -15,6 +14,9 @@ import { Plane } from './plane.js'
 import { Monster } from './monster.js'
 import { updateCurrentTime } from '../js/controllers/time-controller.js'
 import { changeBackground } from '../js/controllers/time-controller.js'
+import { updatePosition } from '../js/controllers/position-controller.js'
+import { Group, Vector2 } from 'three'
+import dat from 'https://unpkg.com/dat.gui@0.7.7/build/dat.gui.module.js'
 
 
 class BasicCharacterControllerProxy {
@@ -527,6 +529,9 @@ class ThreeJS {
         this.camera = this.createCamera();
         this.renderer = this.createRenderer();
 
+        this.raycaster = new THREE.Raycaster();
+        this.pointer = new THREE.Vector2();
+
         this.handleResize();
         this.controls = this.createControl();
 
@@ -673,7 +678,7 @@ class ThreeJS {
     createCamera() {
         const aspect = window.innerWidth / window.innerHeight;
         const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
-        camera.position.set(-8, 2, 10);
+        camera.position.set(-9, 2, 50);
         // Luôn nhìn vào điểm trung tâm
         camera.lookAt(this.scene.position);
         return camera;
@@ -691,6 +696,7 @@ class ThreeJS {
         this.render();
     }
 
+    //Resize
     handleResize() {
         window.addEventListener('resize', () => {
             this.onResize();
@@ -770,6 +776,7 @@ class ThreeJS {
         return ambientLight;
     }
 
+    //Create directionalLight
     createDirectionalLight() {
         const color = 0xffffff;
         const directionalLight = new THREE.DirectionalLight(color);
@@ -819,7 +826,6 @@ class ThreeJS {
 
 //Create ThreeJS object without render 
 var three = new ThreeJS();
-
 var hour = new Date().getMinutes();
 // console.log(changeBackground(three, hour % 24))
 // updateCurrentTime(three)
@@ -827,12 +833,12 @@ var hour = new Date().getMinutes();
 ///////////////////////////////
 /// ADD 3D OBJECT MODEL///////
 /////////////////////////////
-const planeModel = new Plane();
+
+const planeModel = new Plane(three);
 three.scene.add(planeModel.plane);
 
 //Just support .GLB, .GLTF, FBX
 //3 params (scene, path of model, )
-const templePath = '../resource/models/chinese_temple/scene.gltf';
 const monster = '../resource/models/character/wooden/scene.gltf';
 // ModelLoader.load(three.scene, templePath, [0, -.4, 0],);
 // Monster.loadModel(three.scene,three.mixers,[0, -.4, 0],10 );
@@ -841,22 +847,77 @@ const monster = '../resource/models/character/wooden/scene.gltf';
 // ModelLoader.loadFBX(three.scene,'../resource/models/character/characterLola.fbx','../resource/models/monster/breakdance1990.fbx')
 // ModelLoader.load(three.scene, templePath, [-35, -4.25, 0], 10);
 // ModelLoader.load(three.scene, templePath, [35, -4.25, 0], 10);
-const courtyartPath = '../resource/models/ancient_chinese_courtyard_park/scene.gltf';
+
+const templePath = 'chinese_temple/scene.gltf';
+ModelLoader.load(three.scene, templePath, [-35, -4.25, 0], 10);
+ModelLoader.load(three.scene, templePath, [35, -4.25, 0], 10);
+
+const courtyartPath = 'ancient_chinese_courtyard_park/scene.gltf';
 ModelLoader.load(three.scene, courtyartPath, [0, -.4, 0], 70);
 // Monster.loadModel(three.scene,three.mixers,[0, -.4, 0],1.0);
+
+const fortuneTeller = 'fortune-teller/scene.gltf';
+ModelLoader.load(three.scene, fortuneTeller, [8, 0, -42], 1.4);
+
+const redTree = 'red-tree/scene.gltf';
+ModelLoader.load(three.scene, redTree, [8, .5, 40], 5);
+
+const trees = 'trees/scene.gltf';
+ModelLoader.load(three.scene, trees, [-10, 0, 10], 12);
 
 //cập nhật animate của các object trong update()
 
 function update() {
-    // planeModel.animate();
-
-
+    // resetMaterials()
+    // hoverPieces()
 }
 
+// when camera change
+function onPointerMove(event) {
+    // cap nhat lai vi tri
+    updatePosition(three)
+    three.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    three.pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
+}
+
+//  function when hover
+// function hoverPieces() {
+//     three.raycaster.setFromCamera(three.pointer, three.camera)
+//     const intersects = three.raycaster.intersectObjects(three.scene.children);
+//     for (let i = 0; i < intersects.length; i++) {
+//         intersects[i].object.material.opacity = 0
+//     }
+// }
+
+function resetMaterials() {
+    for (let i = 0; i < three.scene.children.length; i++) {
+        if (three.scene.children[i].material) {
+            three.scene.children[i].material.opacity = 1;
+        }
+    }
+}
+
+function onClick(event) {
+    three.raycaster.setFromCamera(three.pointer, three.camera)
+    const intersects = three.raycaster.intersectObjects(three.scene.children);
+    if (intersects.length > 0) {
+        var temp = intersects[0].object;
+        if (temp.parent) {
+            if (temp.parent.parent) {
+                if (temp.parent.parent.parent) {
+                    if (temp.parent.parent.parent.parent) {
+                        if (temp.parent.parent.parent.parent.parent) {
+                            if ( temp.parent.parent.parent.parent.parent.name == fortuneTeller)
+                            alert(temp.parent.parent.parent.parent.parent.name);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+window.addEventListener('pointermove', onPointerMove);
+window.addEventListener('click', onClick)
 //Render
 three.render();
-
-
-
-
 

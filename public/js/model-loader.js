@@ -5,6 +5,7 @@ import { Box3, Vector3 } from 'three';
 
 export class ModelLoader {
     static load(scene, path, xyz, scaleParam) {
+
         if (path.includes('glb') || path.includes('gltf')) {
             console.log('gltf');
             this.loadGLTF(scene, path, xyz, scaleParam)
@@ -20,7 +21,7 @@ export class ModelLoader {
         // Load a glTF resource
         loader.load(
             // resource URL
-            path,
+            '../resource/models/' + path,
             // called when the resource is loaded
             function (gltf) {
                 
@@ -43,6 +44,7 @@ export class ModelLoader {
                 if (scaleParam >= 0) {
                     scale = scaleParam;
                 }
+
                 object.scale.multiplyScalar(scale / maxAxis);
                 bbox.setFromObject(object);
                 bbox.getCenter(cent);
@@ -59,7 +61,9 @@ export class ModelLoader {
                     object.position.y -= xyz[1];
                     object.position.z -= xyz[2];
                 }
-
+                object.name = path
+                console.log(object);
+                
                 scene.add(object);
             },
             // called while loading is progressing
