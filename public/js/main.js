@@ -544,7 +544,7 @@ class ThreeJS {
         this.stats = this.createStats();
         this.mixers = [];
         this.previousRAF = null;
-        this._LoadAnimatedModel();
+        this._LoadAnimatedModel();   
         // Monster.loadModel(this.scene, this.mixers, [0, -.4, 0], 1.0);
         // this._LoadAnimatedModel(path, character, animCharacter, [0, -.4, 0]);
 
