@@ -8,6 +8,6 @@ export function updatePosition(three) {
         && three.camera.position['z'] > -50 && three.camera.position['z'] < 50) {
             location.innerHTML = 'Trung Đô'
     } else {
-        location.innerHTML = 'chua xac dinh'
+        location.innerHTML = 'Chưa xác định'
     }
 }
