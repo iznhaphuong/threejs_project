@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { GLTFLoader } from '/jsm/loaders/GLTFLoader.js'
 import { FBXLoader } from '/jsm/loaders/FBXLoader.js'
 import { Box3, Vector3 } from 'three';
@@ -16,7 +17,7 @@ export class ModelLoader {
     static loadGLTF(scene, path, xyz, scaleParam) {
         // Instantiate a loader
         const loader = new GLTFLoader();
-
+        // let mixer = new AnimationMixer();
         // Load a glTF resource
         loader.load(
             // resource URL
@@ -29,7 +30,7 @@ export class ModelLoader {
                     if ( node.type === 'Mesh' ) { node.castShadow = true; }
             
                 } );
-                
+               
                 const object = gltf.scene;
                 
                 //setup center values
@@ -41,7 +42,7 @@ export class ModelLoader {
                 let scale = 1.0;
                 //scale object
                 if (scaleParam >= 0) {
-                    scale = scaleParam
+                    scale = scaleParam;
                 }
 
                 object.scale.multiplyScalar(scale / maxAxis);
@@ -77,28 +78,51 @@ export class ModelLoader {
         );
     }
 
-    static loadFBX(scene, path) {
+    static loadFBX(scene, path, animPath) {
         // Instantiate a loader
         const loader = new FBXLoader();
+        // let mixer = new AnimationMixer();
 
-        // Load a glTF resource
+        // Load a fbx resource
         loader.load(
             // resource URL
             path,
             // called when the resource is loaded
             function (fbx) {
-                const object = fbx.scene;
-                scene.add(object);
+                fbx.scale.setScalar(0.1);
+                fbx.traverse(c => {
+                    c.castShadow = true;
+                })
+                const anim = new FBXLoader();
+                // anim.setPath(animPath);
+                anim.load(animPath, (anim) => {
+                    this.mixer =  new THREE.AnimationMixer(fbx);
+
+                    const idle = this.mixer.clipAction(anim.animations[0]);
+                    idle.play();
+                });
+                // setupAnimation(fbx);
+                scene.add(fbx);
             },
+
             // called while loading is progressing
             function (xhr) {
                 console.log((xhr.loaded / xhr.total * 100) + '% loaded');
             },
+
             // called when loading has errors
             function (error) {
                 console.log('An error happened');
             }
+
         );
+    }
+    static setupAnimation(object) {
+        this.mixer = new AnimationMixer(object);
+        const clip = object.animations[0];
+        const action = this.mixer.clipAction(clip);
+        action.play();
+
     }
 }
 
