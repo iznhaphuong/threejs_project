@@ -3,7 +3,6 @@ import { OrbitControls } from '/jsm/controls/OrbitControls.js'
 
 import { ObjectLoader } from '/src/loaders/ObjectLoader.js'
 import { AxesHelper } from '/src/helpers/AxesHelper.js'
-// import { GUI } from '/jsm/libs/lil-gui.module.min.js'
 import Stats from '/jsm/libs/stats.module.js'
 //import self-defined class
 import { ModelLoader } from './model-loader.js'
@@ -237,13 +236,24 @@ function update() {
     // resetMaterials()
     // hoverPieces()
 }
-
+const compass = document.querySelector('#compass');
 // when camera change
 function onPointerMove(event) {
     // cap nhat lai vi tri
     updatePosition(three)
     three.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
     three.pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+
+    var vector = new THREE.Vector3();
+var center = new THREE.Vector3();
+var spherical = new THREE.Spherical();
+vector.copy( three.camera.position ).sub( center );
+spherical.setFromVector3( vector );
+var rot = spherical.theta;
+console.log((rot)/Math.PI * 180);
+compass.style.transform = `rotate(${(rot)/Math.PI * 180}deg)`;
+console.log(compass.style.transform.rotate);
 }
 
 //  function when hover
@@ -273,8 +283,8 @@ function onClick(event) {
                 if (temp.parent.parent.parent) {
                     if (temp.parent.parent.parent.parent) {
                         if (temp.parent.parent.parent.parent.parent) {
-                            if ( temp.parent.parent.parent.parent.parent.name == fortuneTeller)
-                            alert(temp.parent.parent.parent.parent.parent.name);
+                            if (temp.parent.parent.parent.parent.parent.name == fortuneTeller)
+                                alert(temp.parent.parent.parent.parent.parent.name);
                         }
                     }
                 }

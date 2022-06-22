@@ -53,7 +53,7 @@ export function changeBackground(three, hour) {
 
     }
     // chieu
-    else {
+    else if (hour < 19) {
         flag = setAtEvening(three)
         console.log('set eve');
 
@@ -85,6 +85,7 @@ function setAtMorning(three) {
 }
 
 function setAtAfternoon(three) {
+    three.scene.fog = null;
     console.log('afternoon');
     three.ambientLight.intensity = 0.4
     three.ambientLight.color.setHex(0xff9a00);
@@ -108,6 +109,7 @@ function setAtAfternoon(three) {
 }
 
 function setAtEvening(three) {
+    three.scene.fog = null;
     three.ambientLight.intensity = 0.1
     three.ambientLight.color.setHex(0xfff);
     three.directionalLight.position.set(-100, 40, 0);
@@ -130,6 +132,7 @@ function setAtEvening(three) {
 }
 
 function setAtNight(three) {
+    three.scene.fog = null;
     three.scene.background = null
     three.ambientLight.intensity = 0.3
     three.ambientLight.color.setHex(0xffffff);
