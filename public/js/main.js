@@ -47,13 +47,13 @@ class ThreeJS {
         this.mixers = [];
         this.previousRAF = null;
         // this._LoadAnimatedModel();  
-        this._RAF(); 
+        this._RAF();
         // Monster.loadModel(this.scene, this.mixers, [0, -.4, 0], 1.0);
         // this._LoadAnimatedModel(path, character, animCharacter, [0, -.4, 0]);
 
     }
 
-    
+
     //For Render()
     render() {
 
@@ -212,8 +212,6 @@ class ThreeJS {
         renderer.shadowMap.enabled = true;
         renderer.shadowMapSoft = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-
         return renderer;
     }
 
@@ -335,10 +333,9 @@ updatePosition(three)
 /////////////////////////////
 
 
-
 const params = {
-        camera: three.camera,
-        scene: three.scene,
+    camera: three.camera,
+    scene: three.scene,
 }
 three.controls = new BasicCharacterController(params);
 
@@ -347,31 +344,39 @@ three.scene.add(planeModel.plane);
 
 //Just support .GLB, .GLTF, FBX
 //3 params (scene, path of model, )
+const courtyart = new THREE.Object3D( );
+const courtyartPath = 'ancient_chinese_courtyard_park/scene.gltf';
+
+const trees = new THREE.Object3D( );
+const treesPath = 'trees/scene.gltf';
+
+const redTree = new THREE.Object3D( );
+const redTreePath = 'red-tree/scene.gltf';
+
+const fortuneTeller = new THREE.Object3D( );
+const fortuneTellerPath = 'fortune-teller/scene.gltf';
+
+const temple = new THREE.Object3D( );
+const templePath = 'chinese_temple/scene.gltf';
+
 const monster = '../resource/models/character/wooden/scene.gltf';
-// ModelLoader.load(three.scene, templePath, [0, -.4, 0],);
 // Monster.loadModel(three.scene,three.mixers,[0, -.4, 0],10 );
-// const courtyartPath = '../resource/models/ancient_chinese_courtyard_park/scene.gltf';
 // ModelLoader.load(three.scene, monster, [5, -.4, 0],20);
 // ModelLoader.loadFBX(three.scene,'../resource/models/character/characterLola.fbx','../resource/models/monster/breakdance1990.fbx')
 // ModelLoader.load(three.scene, templePath, [-35, -4.25, 0], 10);
 // ModelLoader.load(three.scene, templePath, [35, -4.25, 0], 10);
 
-const templePath = 'chinese_temple/scene.gltf';
-ModelLoader.load(three.scene, templePath, [-35, -4.25, 0], 10);
-ModelLoader.load(three.scene, templePath, [35, -4.25, 0], 10);
-
-const courtyartPath = 'ancient_chinese_courtyard_park/scene.gltf';
-ModelLoader.load(three.scene, courtyartPath, [0, -.4, 0], 70);
 // Monster.loadModel(three.scene,three.mixers,[0, -.4, 0],1.0);
+ModelLoader.load(courtyart, courtyartPath, [0, -.4, 0], 70);
+ModelLoader.load(fortuneTeller, fortuneTellerPath, [8, 0, -42], 1.4);
+ModelLoader.load(redTree, redTreePath, [8, .5, 40], 5);
+ModelLoader.load(trees, treesPath, [-10, 0, 10], 12);
 
-const fortuneTeller = 'fortune-teller/scene.gltf';
-ModelLoader.load(three.scene, fortuneTeller, [8, 0, -42], 1.4);
+three.scene.add(courtyart);
+three.scene.add(fortuneTeller);
+three.scene.add(trees);
+three.scene.add(redTree);
 
-const redTree = 'red-tree/scene.gltf';
-ModelLoader.load(three.scene, redTree, [8, .5, 40], 5);
-
-const trees = 'trees/scene.gltf';
-ModelLoader.load(three.scene, trees, [-10, 0, 10], 12);
 
 //cập nhật animate của các object trong update()
 
@@ -389,14 +394,14 @@ function onPointerMove(event) {
 
 
     var vector = new THREE.Vector3();
-var center = new THREE.Vector3();
-var spherical = new THREE.Spherical();
-vector.copy( three.camera.position ).sub( center );
-spherical.setFromVector3( vector );
-var rot = spherical.theta;
-console.log((rot)/Math.PI * 180);
-compass.style.transform = `rotate(${(rot)/Math.PI * 180}deg)`;
-console.log(compass.style.transform.rotate);
+    var center = new THREE.Vector3();
+    var spherical = new THREE.Spherical();
+    vector.copy(three.camera.position).sub(center);
+    spherical.setFromVector3(vector);
+    var rot = spherical.theta;
+    console.log((rot) / Math.PI * 180);
+    compass.style.transform = `rotate(${(rot) / Math.PI * 180}deg)`;
+    console.log(compass.style.transform.rotate);
 }
 
 //  function when hover
@@ -439,4 +444,3 @@ window.addEventListener('pointermove', onPointerMove);
 window.addEventListener('click', onClick)
 //Render
 three.render();
-
