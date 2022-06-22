@@ -37,7 +37,7 @@ export class BasicCharacterController {
     async LoadModels() {
         const loader = new FBXLoader();
         loader.setPath('./resource/models/character/main_character/');
-        loader.load('guard.fbx', (fbx) => {
+        loader.load('erika_archer.fbx', (fbx) => {
             fbx.traverse(c => {
                 c.castShadow = true;
             });
@@ -98,7 +98,7 @@ export class BasicCharacterController {
             loader.load('walk.fbx', (a) => { _OnLoad('walk', a); });
             loader.load('run.fbx', (a) => { _OnLoad('run', a); });
             loader.load('idle.fbx', (a) => { _OnLoad('idle', a); });
-            loader.load('kick.fbx', (a) => { _OnLoad('dance', a); });
+            loader.load('jump.fbx', (a) => { _OnLoad('dance', a); });
 
         });
     }
