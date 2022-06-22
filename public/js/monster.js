@@ -1,14 +1,13 @@
 import * as THREE from 'three';
-import { OrbitControls } from '/jsm/controls/OrbitControls.js'
 import { FBXLoader } from '/jsm/loaders/FBXLoader.js';
 import { Box3, Vector3 } from 'three';
 export class Monster {
 
     static async loadModel(scene, mixers, xyz,scale) {
-        const clock = new THREE.Clock();
+        const clock = new THREE.Clock(); 
         const fbxLoader = new FBXLoader();
-        fbxLoader.setPath('../resource/models/character/');
-        fbxLoader.load('characterLola.fbx', (fbx) => {
+        fbxLoader.setPath('../resource/models/character/main_character');
+        fbxLoader.load('guard.fbx', (fbx) => {
             
             fbx.traverse(c => {
                 c.castShadow = true;
@@ -50,6 +49,7 @@ export class Monster {
                     mixers.push(mixer);
                     console.log(anim.animations[0]);
                     const idle = mixer.clipAction(anim.animations[0]);
+                    activateAllActions();
                     idle.play();
 
                 },
