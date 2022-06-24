@@ -1,32 +1,125 @@
-.wrap-icon {
+ .wrap-icon {
+     position: fixed;
+     /* width: 100%; */
+     right: 5%;
+     top: 30%;
+ }
+/* My compass */
+ 
+.my-compass{
     position: absolute;
-    width: 5%;
-    right: 1%;
-    top: 30%;
+    top: 3%;
+    right: 3%;
+    width: 60px;
+    height: 60px;
+    background-size: 60px;
 }
-.icon-quest {
-    border-radius: 50%;
-    background-image: url('../resource/icons/tied-scroll.png');
+.compass {
     background-repeat: no-repeat;
     background-position: center center;
-    height: 25px;
-    width: 25px;
-    background-size: 25px;
-    cursor: pointer;
-}
-.icon-quest:hover {
-    padding: 5px;
-    border: 2px solid #fff;
-    box-shadow: 1px 0 2px #fff;
-}
-.modal-content{
-    background: rgba(0, 0, 0, .3);
-    color: white
-}
-#location {
-    position: fixed;
-    bottom: 3%;
-    left: 2%;
-    color: white;
-    user-select: none;
-}
+    width: 100%;
+    height: 100%;
+    background-image: url('../resource/icons/compass.png');
+ }
+ .hand{
+    background-repeat: no-repeat;
+    background-position: center center;
+    width: 100%;
+    height: 100%;
+    background-image: url('../resource/icons/hand.png');
+    position: absolute;
+    top: 0;
+ }
+/* Icon tools */
+ .icon-tools {
+     border-radius: 50%;
+     background-repeat: no-repeat;
+     background-position: center center;
+     height: 25px;
+     width: 25px;
+     background-size: 25px;
+     cursor: pointer;
+ }
+ .quest {
+    background-image: url('../resource/icons/tied-scroll.png');
+ }
+
+ .icon-quest:hover {
+     padding: 5px;
+     border: 2px solid #fff;
+     box-shadow: 1px 0 2px #fff;
+ }
+
+ .modal-content {
+     background: rgba(0, 0, 0, .3);
+     color: white
+ }
+
+ #bottom {
+     position: fixed;
+     bottom: 2%;
+     color: white;
+     text-shadow: 1px 2px black;
+ }
+
+ .col-2#location {
+     line-height: 100%;
+     align-self: flex-end;
+     text-align: center;
+     margin-bottom: 5px;
+     user-select: none;
+ }
+
+ .wrap-time {
+     align-items: flex-end;
+     height: 100%;
+ }
+
+ .wrap-time .row {
+     position: absolute;
+     bottom: 0%;
+     height: 60px;
+ }
+
+ .wrap-time .row .icon {
+     align-self: flex-end;
+ }
+
+
+ .text-time {
+     text-align: right;
+     align-self: flex-end;
+
+ }
+
+ #wrap-message {
+     background: rgba(33, 33, 33, 0.7);
+     width: 100%;
+     left: calc(50% - 500px);
+     border-radius: 10px;
+     padding: 10px 30px;
+ }
+
+ .icon {
+     height: 45px;
+ }
+
+ #options {
+     width: 100%;
+ }
+
+ #options .option {
+     border-radius: 10px;
+     padding: 10px 30px;
+     background: rgba(33, 33, 33, 0.7);
+     margin-bottom: 5px;
+ }
+
+ #options .option:hover {
+     border-radius: 10px;
+     padding: 10px 30px;
+     background: rgba(33, 33, 33, 0.7);
+     margin-bottom: 5px;
+     border: 2px solid #fff;
+     box-shadow: 0 0 10px #fff;
+ }

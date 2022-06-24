@@ -4,7 +4,7 @@ import { FBXLoader } from '/jsm/loaders/FBXLoader.js'
 import { Box3, Vector3 } from 'three';
 
 export class ModelLoader {
-    static load(scene, path, xyz, scaleParam) {
+    static load(temp, path, xyz, scaleParam) {
 
         if (path.includes('glb') || path.includes('gltf')) {
             this.loadGLTF(scene, path, xyz, scaleParam)
@@ -13,7 +13,7 @@ export class ModelLoader {
         }
     }
 
-    static loadGLTF(scene, path, xyz, scaleParam) {
+    static loadGLTF(temp, path, xyz, scaleParam) {
         // Instantiate a loader
         const loader = new GLTFLoader();
         // let mixer = new AnimationMixer();
@@ -62,7 +62,7 @@ export class ModelLoader {
                 }
                 object.name = path
                 
-                scene.add(object);
+                temp.add(object);
             },
             // called while loading is progressing
             function (xhr) {
