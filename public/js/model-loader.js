@@ -7,7 +7,7 @@ export class ModelLoader {
     static load(temp, path, xyz, scaleParam) {
 
         if (path.includes('glb') || path.includes('gltf')) {
-            this.loadGLTF(scene, path, xyz, scaleParam)
+            this.loadGLTF(temp, path, xyz, scaleParam)
         } else if (path.includes('fbx')) {
             console.log('fbx');
         }
