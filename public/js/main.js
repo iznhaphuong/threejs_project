@@ -42,7 +42,7 @@ class ThreeJS {
         this.scene.add(this.ambientLight);
         this.directionalLight = this.createDirectionalLight();
         this.scene.add(this.directionalLight);
-        this.createGUI();
+        // this.createGUI();
         this.stats = this.createStats();
         this.mixers = [];
         this.previousRAF = null;

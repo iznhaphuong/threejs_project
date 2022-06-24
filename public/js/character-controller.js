@@ -38,8 +38,6 @@ export class BasicCharacterController {
         const loader = new FBXLoader();
         loader.setPath('./resource/models/character/main_character/');
         loader.load('erika_archer.fbx', (fbx) => {
-
-
             this._target = fbx;
             this._params.scene.add(this._target);
             fbx.traverse(c => {
@@ -51,10 +49,7 @@ export class BasicCharacterController {
             let size = bbox.getSize(new Vector3());
             let maxAxis = Math.max(size.x, size.y, size.z);
             let scale = 1.0;
-            //scale object
-            // if (scaleParam >= 0) {
-            //     scale = scaleParam;
-            // }
+
             fbx.scale.setScalar(scale / maxAxis);
             bbox.setFromObject(fbx);
             bbox.getCenter(cent);
@@ -155,10 +150,6 @@ export class BasicCharacterController {
             acc.multiplyScalar(1.0);
         }
 
-        // console.log("currentSate "+this._stateMachine._currentState.Name());
-        // if (this._stateMachine._currentState.Name() == 'jump') {
-        //     acc.multiplyScalar(0.0);
-        // }
 
         //add animation 
         if (this._input._keys.forward) {
