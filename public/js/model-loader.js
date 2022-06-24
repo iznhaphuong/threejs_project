@@ -7,7 +7,6 @@ export class ModelLoader {
     static load(temp, path, xyz, scaleParam) {
 
         if (path.includes('glb') || path.includes('gltf')) {
-            console.log('gltf');
             this.loadGLTF(temp, path, xyz, scaleParam)
         } else if (path.includes('fbx')) {
             console.log('fbx');
@@ -62,7 +61,6 @@ export class ModelLoader {
                     object.position.z -= xyz[2];
                 }
                 object.name = path
-                console.log(object);
                 
                 temp.add(object);
             },
