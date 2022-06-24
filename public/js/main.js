@@ -11,13 +11,13 @@ import { TWEEN } from '/jsm/libs/tween.module.min.js'
 //import self-defined class
 import { ModelLoader } from './model-loader.js'
 import { Plane } from './plane.js'
-import { Monster } from './monster.js'
 import { updateCurrentTime } from '../js/controllers/time-controller.js'
 import { changeBackground } from '../js/controllers/time-controller.js'
 import { updatePosition } from '../js/controllers/position-controller.js'
 import { Group, Vector2 } from 'three'
 import dat from 'https://unpkg.com/dat.gui@0.7.7/build/dat.gui.module.js'
 import { BasicCharacterController } from './character-controller.js'
+import { ThirdPersonCamera } from './character-controller.js'
 
 
 
@@ -47,14 +47,22 @@ class ThreeJS {
         this.stats = this.createStats();
         this.mixers = [];
         this.previousRAF = null;
-        // this._LoadAnimatedModel();  
-        this._RAF(); 
-        // Monster.loadModel(this.scene, this.mixers, [0, -.4, 0], 1.0);
-        // this._LoadAnimatedModel(path, character, animCharacter, [0, -.4, 0]);
+        this._RAF();
+        //Character controller
+        const params = {
+            camera: this.camera,
+            scene: this.scene,
+        }
+        this.controls = new BasicCharacterController(params);
+        //ThirdPersonCamera
+        this.thirdPersonCamera = new ThirdPersonCamera({
+            camera: this.camera,
+            target: this.controls,
+        })
 
     }
 
-    
+
     //For Render()
     render() {
 
@@ -87,82 +95,8 @@ class ThreeJS {
         if (this.controls) {
             this.controls.Update(timeElapsedS);
         }
+        this.thirdPersonCamera.Update(timeElapsedS);
     }
-
-    // _LoadAnimatedModel(path, modelFile, animFile, xyz) {
-    //     const loader = new FBXLoader();
-
-    //     loader.setPath(path);
-    //     loader.load(modelFile, (fbx) => {
-
-    //         fbx.traverse(c => {
-    //             c.castShadow = true;
-    //         });
-    //         //setup center values
-    //         let bbox = new Box3().setFromObject(fbx);
-    //         let cent = bbox.getCenter(new Vector3());
-    //         let size = bbox.getSize(new Vector3());
-    //         let maxAxis = Math.max(size.x, size.y, size.z);
-
-    //         let scale = 1.0;
-    //         //scale object
-    //         // if (scaleParam >= 0) {
-    //         //     scale = scaleParam;
-    //         // }
-    //         fbx.scale.setScalar(scale / maxAxis);
-    //         bbox.setFromObject(fbx);
-    //         bbox.getCenter(cent);
-    //         bbox.getSize(size);
-    //         // fbx.position.z = -1;
-    //         if (!Array.isArray(xyz) || xyz.length < 3) {
-    //             //center object 
-    //             fbx.position.x -= cent.x;
-    //             fbx.position.y -= cent.y;
-    //             fbx.position.z -= cent.z;
-    //         } else {
-    //             //custom set object position 
-    //             fbx.position.x -= xyz[0];
-    //             fbx.position.y -= xyz[1];
-    //             fbx.position.z -= xyz[2];
-    //         }
-
-    //         this.target = fbx;
-    //         this.params.scene.add(this.target);
-    //         this.manager = new THREE.LoadingManager();
-    //         this.manager.onLoad = () => {
-    //             this.stateMachine.SetState('idle');
-    //         };
-    //         const _OnLoad = (animName, anim) => {
-    //             const clip = anim.animations[0];
-    //             const action = this._mixer.clipAction(clip);
-
-    //             this.animations[animName] = {
-    //                 clip: clip,
-    //                 action: action,
-    //             };
-    //         };
-    //         this.controls = new BasicCharacterControls(params);
-
-    //         const loader = new FBXLoader(this.manager);
-    //         loader.setPath('./resources/zombie/');
-    //         loader.load('walk.fbx', (a) => { _OnLoad('walk', a); });
-    //         loader.load('run.fbx', (a) => { _OnLoad('run', a); });
-    //         loader.load('idle.fbx', (a) => { _OnLoad('idle', a); });
-    //         loader.load('dance.fbx', (a) => { _OnLoad('dance', a); });
-
-    //         // const anim = new FBXLoader();
-    //         // //add an animation from another file    
-    //         // anim.setPath(path);
-    //         // anim.load(animFile, (anim) => {
-    //         //     const m = new THREE.AnimationMixer(fbx);
-    //         //     this.mixers.push(m);
-    //         //     const idle = m.clipAction(anim.animations[0]);
-    //         //     idle.play();
-    //         // });
-    //         // this.scene.add(fbx);
-
-    //     });
-    // }
     //Create SCENE
     createScene() {
         const scene = new THREE.Scene();
@@ -174,11 +108,22 @@ class ThreeJS {
 
     //Create CAMERA
     createCamera() {
+        const fov = 60;
+        const near = 0.1;
+        const far = 1000;
         const aspect = window.innerWidth / window.innerHeight;
-        const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
         camera.position.set(-9, 2, 50);
         // Luôn nhìn vào điểm trung tâm
         camera.lookAt(this.scene.position);
+        const left = -100;
+        const right = 100;
+        const top = 100;
+        const bottom = -100;
+        const orthographicCamera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
+
+
+        this.scene.add(orthographicCamera);
         return camera;
     }
 
@@ -212,6 +157,8 @@ class ThreeJS {
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMap.enabled = true;
         renderer.shadowMapSoft = true;
+        // renderer.setPixelRatio(window.devicePixelRatio);
+
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 
@@ -288,14 +235,14 @@ class ThreeJS {
         directionalLight.visible = true;
         // directionalLight.shadow.camera = true;
         // Phải cho đủ nếu không bóng sẽ bị cắt
-        directionalLight.shadow.camera.near = 2;
+        directionalLight.shadow.camera.near = 0.1;
         directionalLight.shadow.camera.far = 500;
         directionalLight.shadow.camera.left = -50;
         directionalLight.shadow.camera.right = 50;
         directionalLight.shadow.camera.top = 50;
         directionalLight.shadow.camera.bottom = -50;
-        directionalLight.shadow.mapSize.width = 500;
-        directionalLight.shadow.mapSize.height = 500;
+        directionalLight.shadow.mapSize.width = 2048;
+        directionalLight.shadow.mapSize.height = 2048;
 
 
         const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight);
@@ -334,11 +281,7 @@ var hour = new Date().getMinutes();
 
 
 
-const params = {
-        camera: three.camera,
-        scene: three.scene,
-}
-three.controls = new BasicCharacterController(params);
+
 
 const planeModel = new Plane(three);
 three.scene.add(planeModel.plane);
@@ -413,8 +356,8 @@ function onClick(event) {
                 if (temp.parent.parent.parent) {
                     if (temp.parent.parent.parent.parent) {
                         if (temp.parent.parent.parent.parent.parent) {
-                            if ( temp.parent.parent.parent.parent.parent.name == fortuneTeller)
-                            alert(temp.parent.parent.parent.parent.parent.name);
+                            if (temp.parent.parent.parent.parent.parent.name == fortuneTeller)
+                                alert(temp.parent.parent.parent.parent.parent.name);
                         }
                     }
                 }
