@@ -399,9 +399,9 @@ function onPointerMove(event) {
     vector.copy(three.camera.position).sub(center);
     spherical.setFromVector3(vector);
     var rot = spherical.theta;
-    console.log((rot) / Math.PI * 180);
+    // console.log((rot) / Math.PI * 180);
     compass.style.transform = `rotate(${(rot) / Math.PI * 180}deg)`;
-    console.log(compass.style.transform.rotate);
+    // console.log(compass.style.transform.rotate);
 }
 
 //  function when hover
@@ -431,8 +431,8 @@ function onClick(event) {
                 if (temp.parent.parent.parent) {
                     if (temp.parent.parent.parent.parent) {
                         if (temp.parent.parent.parent.parent.parent) {
-                            if (temp.parent.parent.parent.parent.parent.name == fortuneTeller)
-                                alert(temp.parent.parent.parent.parent.parent.name);
+                            if (temp.parent.parent.parent.parent.parent.name == fortuneTellerPath)
+                                alert("Xin chào");
                         }
                     }
                 }
