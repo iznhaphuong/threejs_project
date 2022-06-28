@@ -400,8 +400,8 @@ function onClick(event) {
                 if (temp.parent.parent.parent) {
                     if (temp.parent.parent.parent.parent) {
                         if (temp.parent.parent.parent.parent.parent) {
-                            if (temp.parent.parent.parent.parent.parent.name == fortuneTeller)
-                                alert(temp.parent.parent.parent.parent.parent.name);
+                            if (temp.parent.parent.parent.parent.parent.name == fortuneTellerPath)
+                                alert("Xin chào");
                         }
                     }
                 }
