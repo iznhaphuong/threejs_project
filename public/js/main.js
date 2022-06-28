@@ -15,9 +15,10 @@ import { changeBackground } from '../js/controllers/time-controller.js'
 import { updatePosition } from '../js/controllers/position-controller.js'
 import { Group, Vector2 } from 'three'
 import dat from 'https://unpkg.com/dat.gui@0.7.7/build/dat.gui.module.js'
-import { BasicCharacterController } from './character-controller.js'
-import { ThirdPersonCamera } from './character-controller.js'
-
+import { character } from './character-controller.js'
+import { entity_manager } from './entity-manager.js'
+// import { ThirdPersonCamera } from './character-controller.js'
+import { model } from './model.js';
 
 
 
@@ -36,32 +37,56 @@ class ThreeJS {
 
         this.handleResize();
         this.controls = this.createControl();
-
+        this._entityManager = new entity_manager.EntityManager();
         //Add lights
         this.ambientLight = this.createAmbientLight();
         this.scene.add(this.ambientLight);
         this.directionalLight = this.createDirectionalLight();
         this.scene.add(this.directionalLight);
-        this.createGUI();
+        // this.createGUI();
         this.stats = this.createStats();
         this.mixers = [];
         this.previousRAF = null;
         this._RAF();
+        this.LoadPlayer();
+
+    }
+
+    LoadPlayer() {
         //Character controller
         const params = {
             camera: this.camera,
             scene: this.scene,
         }
-        this.controls = new BasicCharacterController(params);
+        // this.controls = new character.BasicCharacterController(params);
         //ThirdPersonCamera
-        this.thirdPersonCamera = new ThirdPersonCamera({
-            camera: this.camera,
-            target: this.controls,
-        })
+        // this.thirdPersonCamera = new character.ThirdPersonCamera({
+        //     camera: this.camera,
+        //     target: this.controls,
+        // })
+        const player = new model.Entity();
 
+        ///Health
+        // player.AddComponent(new health_component.HealthComponent({
+        //     updateUI: true,
+        //     health: 100,
+        //     maxHealth: 100,
+        //     strength: 50,
+        //     wisdomness: 5,
+        //     benchpress: 20,
+        //     curl: 100,
+        //     experience: 0,
+        //     level: 1,
+        // }));
+        player.AddComponent(new character.BasicCharacterController(params));
+        this._entityManager.Add(player, 'player');
+        const camera = new model.Entity();
+        camera.AddComponent(
+            new character.ThirdPersonCamera({
+                camera: this.camera,
+                target: this._entityManager.Get('player')}));
+        this._entityManager.Add(camera, 'player-camera');
     }
-
-
     //For Render()
     render() {
 
@@ -94,7 +119,8 @@ class ThreeJS {
         if (this.controls) {
             this.controls.Update(timeElapsedS);
         }
-        this.thirdPersonCamera.Update(timeElapsedS);
+        this._entityManager.Update(timeElapsedS);
+        // this.thirdPersonCamera.Update(timeElapsedS);
     }
     //Create SCENE
     createScene() {
@@ -288,19 +314,19 @@ three.scene.add(planeModel.plane);
 
 //Just support .GLB, .GLTF, FBX
 //3 params (scene, path of model, )
-const courtyart = new THREE.Object3D( );
+const courtyart = new THREE.Object3D();
 const courtyartPath = 'ancient_chinese_courtyard_park/scene.gltf';
 
-const trees = new THREE.Object3D( );
+const trees = new THREE.Object3D();
 const treesPath = 'trees/scene.gltf';
 
-const redTree = new THREE.Object3D( );
+const redTree = new THREE.Object3D();
 const redTreePath = 'red-tree/scene.gltf';
 
-const fortuneTeller = new THREE.Object3D( );
+const fortuneTeller = new THREE.Object3D();
 const fortuneTellerPath = 'fortune-teller/scene.gltf';
 
-const temple = new THREE.Object3D( );
+const temple = new THREE.Object3D();
 const templePath = 'chinese_temple/scene.gltf';
 
 const monster = '../resource/models/character/wooden/scene.gltf';
@@ -343,9 +369,8 @@ function onPointerMove(event) {
     vector.copy(three.camera.position).sub(center);
     spherical.setFromVector3(vector);
     var rot = spherical.theta;
-    // console.log((rot) / Math.PI * 180);
     compass.style.transform = `rotate(${(rot) / Math.PI * 180}deg)`;
-    // console.log(compass.style.transform.rotate);
+
 }
 
 //  function when hover

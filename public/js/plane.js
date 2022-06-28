@@ -23,7 +23,7 @@ export class Plane {
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
         this.setPosition(plane);
         plane.receiveShadow = true;
-
+        plane.rotation.x = -Math.PI / 2;
         return plane;
 
     }
